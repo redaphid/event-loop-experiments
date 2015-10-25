@@ -3,7 +3,7 @@ async = require 'async'
 
 class GreedyOperation
   constructor: (options={})->
-    {@arrayLength, @arrayCount, @offset} = options
+    {@arrayLength, @arrayCount, @offset, @maxConcurrentJobs, @jobsInProgress} = options
     @arrayLength ?= 200
     @offset ?= 10
 
@@ -18,8 +18,6 @@ class GreedyOperation
     jobNumber = GreedyOperation.jobCount++
     GreedyOperation.jobsInProgress++
 
-    console.log "job #{jobNumber} started"
-
     matrix = @generateMatrix()
     jobs = _.zipWith matrix, matrix, (col1, col2) =>
         (callback) => @asyncMultiplyColumns jobNumber, col1, col2, callback
@@ -30,8 +28,9 @@ class GreedyOperation
         sum: _.sum _.flatten results
         startTime: startTime
         endTime: Date.now()
-
-      console.log "job #{jobNumber} ended in #{result.endTime - result.startTime}ms"
+        jobNumber: jobNumber
+        maxConcurrentJobs: @maxConcurrentJobs
+        jobsInProgress: @jobsInProgress
 
       callback null, result
 
