@@ -16,6 +16,8 @@ class GreedyOperation
   doWork: (job, callback=->) =>
     startTime = Date.now()
     jobNumber = GreedyOperation.jobCount++
+    GreedyOperation.jobsInProgress++
+
     console.log "job #{jobNumber} started"
 
     matrix = @generateMatrix()
@@ -23,6 +25,7 @@ class GreedyOperation
         (callback) => @asyncMultiplyColumns jobNumber, col1, col2, callback
 
     async.series jobs, (error, results) =>
+      GreedyOperation.jobsInProgress--
       result =
         sum: _.sum _.flatten results
         startTime: startTime
@@ -33,10 +36,11 @@ class GreedyOperation
       callback null, result
 
   asyncMultiplyColumns: (jobNumber, column1, column2, callback=->) =>
-    console.log "job #{jobNumber} multiplying..."
+    # console.log "job #{jobNumber} multiplying..."
     result = _.zipWith column1, column2, Math.pow
     _.defer => callback null, result
 
   @jobCount: 0
+  @jobsInProgress: 0
 
 module.exports = GreedyOperation
