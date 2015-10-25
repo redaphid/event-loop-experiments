@@ -4,31 +4,39 @@ async = require 'async'
 class GreedyOperation
   constructor: (options={})->
     {@arrayLength, @arrayCount, @offset} = options
-    @arrayLength ?= 100
-    @arrayCount ?= 1000
+    @arrayLength ?= 200
     @offset ?= 10
+
+  generateMatrix: =>
+    matrix = []
+    rangeArray = _.range @offset, @arrayLength + @offset
+
+    _.map rangeArray, (element) => _.shuffle rangeArray
+
   doWork: (job, callback=->) =>
     startTime = Date.now()
-    matrix = []
-    jobs = []
-    rangeArray = _.range @offset, @arrayLength + @offset
-    for column in [0..@arrayLength]
-      matrix.push _.shuffle rangeArray
+    jobNumber = GreedyOperation.jobCount++
+    console.log "job #{jobNumber} started"
 
-    _.each matrix, (column1) =>
-      _.each matrix, (column2) =>
-        jobs.push (callback) => @asyncMultiplyColumns column1, column2, callback
+    matrix = @generateMatrix()
+    jobs = _.zipWith matrix, matrix, (col1, col2) =>
+        (callback) => @asyncMultiplyColumns jobNumber, col1, col2, callback
 
-    async.parallel jobs, (error, results) =>
+    async.series jobs, (error, results) =>
       result =
         sum: _.sum _.flatten results
         startTime: startTime
         endTime: Date.now()
 
+      console.log "job #{jobNumber} ended in #{result.endTime - result.startTime}ms"
+
       callback null, result
 
-  asyncMultiplyColumns: (column1, column2, callback=->) =>
+  asyncMultiplyColumns: (jobNumber, column1, column2, callback=->) =>
+    console.log "job #{jobNumber} multiplying..."
     result = _.zipWith column1, column2, Math.pow
     _.defer => callback null, result
+
+  @jobCount: 0
 
 module.exports = GreedyOperation

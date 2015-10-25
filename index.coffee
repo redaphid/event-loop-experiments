@@ -2,8 +2,7 @@ GreedyOperation = require './greedy-operation'
 async = require 'async'
 _ = require 'lodash'
 
-startJob = (callback) ->
-  console.log "starting a job"
+startJob = (callback) ->  
   greed = new GreedyOperation
   greed.doWork {}, callback
 
