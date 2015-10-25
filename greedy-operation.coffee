@@ -4,10 +4,11 @@ async = require 'async'
 class GreedyOperation
   constructor: (options={})->
     {@arrayLength, @arrayCount, @offset} = options
-    @arrayLength ?= 10
-    @arrayCount ?= 10
-    @offset ?= 100
+    @arrayLength ?= 100
+    @arrayCount ?= 1000
+    @offset ?= 10
   doWork: (job, callback=->) =>
+    startTime = Date.now()
     matrix = []
     jobs = []
     rangeArray = _.range @offset, @arrayLength + @offset
@@ -19,7 +20,12 @@ class GreedyOperation
         jobs.push (callback) => @asyncMultiplyColumns column1, column2, callback
 
     async.parallel jobs, (error, results) =>
-      console.log "all done!", error, results
+      result =
+        sum: _.sum _.flatten results
+        startTime: startTime
+        endTime: Date.now()
+
+      callback null, result
 
   asyncMultiplyColumns: (column1, column2, callback=->) =>
     result = _.zipWith column1, column2, Math.pow
