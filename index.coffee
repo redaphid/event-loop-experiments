@@ -1,10 +1,23 @@
 GreedyOperation = require './greedy-operation'
+async = require 'async'
+_ = require 'lodash'
 
-greed = new GreedyOperation
+startJob = (callback) ->
+  console.log "starting a job"
+  greed = new GreedyOperation
+  greed.doWork {}, callback
 
-greed.doWork {}, (error, result) ->
-  reportGreed result
+
+jobsDone = (error, results) ->
+  console.log "#{results.length} jobs done!"
+  console.log JSON.stringify results, null, 2
+  times = _.map results, (result) => result.endTime - result.startTime
+  console.log "Average job time: #{_.sum(times)/times.length}ms"
 
 
-reportGreed = (result) ->
-  console.log "Job took #{result.endTime - result.startTime}ms"
+NUM_JOBS = process.argv[2]
+jobs = []
+jobs.length = NUM_JOBS
+_.fill jobs, startJob
+
+async.parallel jobs, jobsDone
