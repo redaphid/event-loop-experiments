@@ -1,0 +1,24 @@
+{
+  "name": "event-loop-experiments",
+  "version": "1.0.0",
+  "description": "Nothing to see here.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/redaphid/event-loop-experiments.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/redaphid/event-loop-experiments/issues"
+  },
+  "homepage": "https://github.com/redaphid/event-loop-experiments#readme",
+  "dependencies": {
+    "async": "^1.4.2",
+    "lodash": "^3.10.1"
+  }
+}
